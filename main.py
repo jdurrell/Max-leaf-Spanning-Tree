@@ -43,7 +43,7 @@ def assertValidSolution(originalGraph: igraph.Graph, solutionTree: igraph.Graph,
 
 def writeGraphToFile(graph: igraph.Graph, numLeaves, filename: str):
     file = open(filename, 'a')
-    file.write(f'{numLeaves} {graph.vcount() - 1}\n')  # number of edges in a spanning tree is equal to number of vertices minus 1
+    file.write(f'{numLeaves} {graph.ecount()}\n')
     for edge in graph.to_tuple_list():
         file.write(f'{edge[0]} {edge[1]}\n')
     file.close()

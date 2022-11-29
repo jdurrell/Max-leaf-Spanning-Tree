@@ -1,0 +1,23 @@
+from igraph import Graph
+from queue import PriorityQueue
+
+def solve(graph: Graph) -> tuple(Graph, int):
+    indegreeList = graph.indegree()
+    maxIndegree = max(indegreeList)
+    maxIndegreeNode = indegreeList.index(maxIndegree)  # vertices are numbered 0 to n, so this is valid
+
+    spanningTree = Graph()
+    spanningTree.add_vertices(range(graph.vcount()))
+    searchQueue = PriorityQueue()
+    searchQueue.put((-1 * maxIndegree, (-1, maxIndegreeNode))) # PriorityQueue uses min-heap, so we must flip the sign of the priority
+    discoveredNodes = set().add(maxIndegreeNode)
+    while not searchQueue.empty():
+        currentEdge = searchQueue.get()
+        if currentEdge[0] != -1:  # don't add an edge for the first vertex because its a start vertex with no edge
+            spanningTree.add_edge(currentEdge[0], currentEdge[1])
+        for neighbor in graph.neighbors(currentEdge[1]):
+            if neighbor not in discoveredNodes:
+                searchQueue.add((-1 * indegreeList[currentEdge[1]], (currentEdge[1], neighbor)))
+                discoveredNodes.add(neighbor)
+
+    return spanningTree, len([indegree for indegree in spanningTree.indegree() if indegree == 1])

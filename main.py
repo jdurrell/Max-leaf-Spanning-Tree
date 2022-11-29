@@ -1,6 +1,7 @@
 import os
 import igraph
 from graphParser import GraphParser
+from SolutionAlgorithms import IndegreeOrderBFS
 
 def main():
     inputFilename = 'hard.in'
@@ -16,8 +17,9 @@ def main():
     parser = GraphParser(inputFilename)
     while parser.hasNext():
         graph = parser.readNextGraph()
-        assertValidSolution(graph, graph, 123)
-        writeGraphToFile(graph, 123, outputFilename)
+        solutionTree, numLeaves = IndegreeOrderBFS.solve()
+        assertValidSolution(graph, solutionTree, numLeaves)
+        writeGraphToFile(solutionTree, numLeaves, outputFilename)
     parser.close()
 
 

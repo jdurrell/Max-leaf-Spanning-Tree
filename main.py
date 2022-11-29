@@ -4,7 +4,7 @@ from graphParser import GraphParser
 from SolutionAlgorithms import DegreeOrderBFS
 
 def main():
-    inputFilename = 'hard.in'
+    inputFilename = 'test.in'
     outputFilename = 'hard.out'
 
     # generate new output filename if it already exists

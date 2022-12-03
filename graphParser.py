@@ -18,7 +18,7 @@ class GraphParser:
         numEdges = int(headerFields[1])
 
         graph = igraph.Graph()
-        graph.add_vertices(numVertices)        
+        graph.add_vertices([str(x) for x in range(numVertices)])  # need to name the vertices
         while numEdges > 0:
             edgeFields = self.file.readline().split()
             graph.add_edge(int(edgeFields[0]), int(edgeFields[1]))

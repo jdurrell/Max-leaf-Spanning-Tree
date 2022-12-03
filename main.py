@@ -2,6 +2,7 @@ import os
 import igraph
 from graphParser import GraphParser
 from SolutionAlgorithms import DegreeOrderBFS
+from SolutionAlgorithms import ForestWithExpansionRules
 
 def main():
     inputFilename = 'test.in'
@@ -17,7 +18,7 @@ def main():
     parser = GraphParser(inputFilename)
     while parser.hasNext():
         graph = parser.readNextGraph()
-        solutionTree, numLeaves = DegreeOrderBFS.solve(graph)
+        solutionTree, numLeaves = ForestWithExpansionRules.solve(graph)
         assertValidSolution(graph, solutionTree, numLeaves)
         writeGraphToFile(solutionTree, numLeaves, outputFilename)
     parser.close()

@@ -25,23 +25,25 @@ def solve(graph: Graph):
         # expand the tree while it has an expandable leaf
         expandingNodeTuple = getExpandableNode(graphInProcess, nodesInTree, leaves)
         while expandingNodeTuple is not None:
-            leafNode = expandingNodeTuple[0]
-            leaves.remove(leafNode["name"])
-            nonTreeNeighbors = [x for x in graph.neighbors(leafNode) if x not in nodesInTree]
-            if len(nonTreeNeighbors == 1):
-                neighbor = nonTreeNeighbors[0]
-                spanningTree.add_edge(leafNode["name"], neighbor["name"])
-                nodesInTree.add(neighbor["name"])
-                for extendedNeighbor in graphInProcess.neighbors(neighbor["name"]):
-                    if extendedNeighbor["name"] not in nodesInTree:
-                        nodesInTree.add(extendedNeighbor["name"])
-                        leaves.add(extendedNeighbor["name"])
-                        spanningTree.add_edge(neighbor["name"], extendedNeighbor["name"])
+            leafNodeName: str = expandingNodeTuple[0]
+            leaves.remove(leafNodeName)
+            nonTreeNeighbors: list[str] = [graphInProcess.vs[x]["name"] for x in graphInProcess.neighbors(leafNodeName) if graphInProcess.vs[x]["name"] not in nodesInTree]
+            if len(nonTreeNeighbors) == 1:
+                neighborName = nonTreeNeighbors[0]
+                # neighborName: str = graphInProcess.vs[neighbor]["name"]
+                spanningTree.add_edge(leafNodeName, neighborName)
+                nodesInTree.add(neighborName)
+                for extendedNeighbor in graphInProcess.neighbors(neighborName):
+                    extendedNeighborName = graphInProcess.vs[extendedNeighbor]["name"]
+                    if extendedNeighborName not in nodesInTree:
+                        nodesInTree.add(extendedNeighborName)
+                        leaves.add(extendedNeighborName)
+                        spanningTree.add_edge(neighborName, extendedNeighborName)
             else:
-                for neighbor in nonTreeNeighbors:
-                    nodesInTree.add(neighbor["name"])
-                    leaves.add(neighbor["name"])
-                    spanningTree.add_edge(leafNode["name"], neighbor["name"])
+                for neighborName in nonTreeNeighbors:
+                    nodesInTree.add(neighborName)
+                    leaves.add(neighborName)
+                    spanningTree.add_edge(leafNodeName, neighborName)
             
             expandingNodeTuple = getExpandableNode(graphInProcess, nodesInTree, leaves)
         
@@ -86,7 +88,7 @@ def getExpandableNode(graph: Graph, nodesInTree: set, leaves: set):
         nonTreeNeighbors = [graph.vs[x]["name"] for x in graph.neighbors(leaf) if graph.vs[x]["name"] not in nodesInTree]
         if len(nonTreeNeighbors) == 1:
             nonTreeNeighborsOfNeighbor = [graph.vs[x]["name"] for x in graph.neighbors(nonTreeNeighbors[0]) if graph.vs[x]["name"] not in nodesInTree]
-            if len(nonTreeNeighborsOfNeighbor) >= 2 and len(nonTreeNeighborsOfNeighbor) > leafPriorityDegree[2]:
+            if len(nonTreeNeighborsOfNeighbor) >= 2 and (1 < leafPriorityDegree[1] or len(nonTreeNeighborsOfNeighbor) > leafPriorityDegree[2]):
                 leafPriorityDegree = (leaf, 1, len(nonTreeNeighborsOfNeighbor))
         elif len(nonTreeNeighbors) >= 2:
             # skip this expansion if we've already found an expansion of higher priority

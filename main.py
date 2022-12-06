@@ -1,12 +1,12 @@
 import os
 import igraph
 from graphParser import GraphParser
-from SolutionAlgorithms import DegreeOrderBFS
+# from SolutionAlgorithms import DegreeOrderBFS
 from SolutionAlgorithms import ForestWithExpansionRules
 
 def main():
-    inputFilename = 'test.in'
-    outputFilename = 'hard.out'
+    inputFilename = 'hard.in'
+    outputFilename = 'hardtest.out'
 
     # generate new output filename if it already exists
     if os.path.isfile(outputFilename):
@@ -18,6 +18,7 @@ def main():
     parser = GraphParser(inputFilename)
     while parser.hasNext():
         graph = parser.readNextGraph()
+        assert graph.is_connected()  # ensure that the graph has a valid spanning tree
         solutionTree, numLeaves = ForestWithExpansionRules.solve(graph)
         assertValidSolution(graph, solutionTree, numLeaves)
         writeGraphToFile(solutionTree, numLeaves, outputFilename)
@@ -25,6 +26,8 @@ def main():
 
 
 def assertValidSolution(originalGraph: igraph.Graph, solutionTree: igraph.Graph, numLeaves):
+    assert solutionTree.is_connected()
+    
     # assert correct number of edges to be a tree
     assert solutionTree.ecount() == solutionTree.vcount() - 1
 
@@ -47,9 +50,38 @@ def assertValidSolution(originalGraph: igraph.Graph, solutionTree: igraph.Graph,
 def writeGraphToFile(graph: igraph.Graph, numLeaves, filename: str):
     file = open(filename, 'a')
     file.write(f'{numLeaves} {graph.ecount()}\n')
-    for edge in graph.to_tuple_list():
+
+    edgeList = lexigraphicalEdgeOrder(graph)
+    for edge in edgeList:
         file.write(f'{edge[0]} {edge[1]}\n')
+    # adjacency_list = graph.to_list_dict()
+    # for key in sorted(adjacency_list.keys()):
+    #     for neighbor in sorted(adjacency_list[key]):
+    #         file.write(f'{key} {neighbor}\n')
+
     file.close()
+
+
+def lexigraphicalEdgeOrder(graph: igraph.Graph):
+    adjacency_list = {}
+    for edge in graph.es:
+        source = int(graph.vs[edge.source]["name"])
+        target = int(graph.vs[edge.target]["name"])
+        if source < target:
+            a = source
+            b = target
+        else:
+            b = source
+            a = target
+        if a not in adjacency_list.keys():
+            adjacency_list[a] = []
+        adjacency_list[a].append(b)
+    
+    edges = []
+    for node in sorted(adjacency_list.keys()):
+        for neighbor in sorted(adjacency_list[node]):
+            edges.append((node, neighbor))
+    return edges     
 
 
 if __name__ == '__main__':

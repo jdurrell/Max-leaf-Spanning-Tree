@@ -27,23 +27,23 @@ def solve(graph: Graph):
         while expandingNodeTuple is not None:
             leafNodeName: str = expandingNodeTuple[0]
             leaves.remove(leafNodeName)
-            nonTreeNeighbors: list[str] = [graphInProcess.vs[x]["name"] for x in graphInProcess.neighbors(leafNodeName) if graphInProcess.vs[x]["name"] not in nodesInTree]
+            nonTreeNeighbors: list[str] = [graphInProcess.vs[x]["name"] for x in graphInProcess.neighbors(graphInProcess.vs.find(leafNodeName)) if graphInProcess.vs[x]["name"] not in nodesInTree]
             if len(nonTreeNeighbors) == 1:
                 neighborName = nonTreeNeighbors[0]
                 # neighborName: str = graphInProcess.vs[neighbor]["name"]
-                spanningTree.add_edge(leafNodeName, neighborName)
+                spanningTree.add_edge(spanningTree.vs.find(leafNodeName), spanningTree.vs.find(neighborName))
                 nodesInTree.add(neighborName)
-                for extendedNeighbor in graphInProcess.neighbors(neighborName):
+                for extendedNeighbor in graphInProcess.neighbors(graphInProcess.vs.find(neighborName)):
                     extendedNeighborName = graphInProcess.vs[extendedNeighbor]["name"]
                     if extendedNeighborName not in nodesInTree:
                         nodesInTree.add(extendedNeighborName)
                         leaves.add(extendedNeighborName)
-                        spanningTree.add_edge(neighborName, extendedNeighborName)
+                        spanningTree.add_edge(spanningTree.vs.find(neighborName), spanningTree.vs.find(extendedNeighborName))
             else:
                 for neighborName in nonTreeNeighbors:
                     nodesInTree.add(neighborName)
                     leaves.add(neighborName)
-                    spanningTree.add_edge(leafNodeName, neighborName)
+                    spanningTree.add_edge(spanningTree.vs.find(leafNodeName), spanningTree.vs.find(neighborName))
             
             expandingNodeTuple = getExpandableNode(graphInProcess, nodesInTree, leaves)
         
@@ -61,16 +61,17 @@ def solve(graph: Graph):
 
             # if endpoints are from different connected components, add the edge to the spanning tree and connect the components
             if setIndexSource is None and setIndexTarget is None:
-                spanningTree.add_edge(source, target)
+                spanningTree.add_edge(spanningTree.vs.find(source), spanningTree.vs.find(target))
                 treeSets.append(set([source, target]))
             elif setIndexSource != setIndexTarget:
-                spanningTree.add_edge(source, target)
+                spanningTree.add_edge(spanningTree.vs.find(source), spanningTree.vs.find(target))
                 if setIndexSource is None:
                     treeSets[setIndexTarget].add(source)
                 elif setIndexTarget is None:
                     treeSets[setIndexSource].add(target)
                 else:
-                    treeSets[setIndexSource] = treeSets[setIndexSource].union(treeSets.pop(setIndexTarget))
+                    treeSets[setIndexSource] = treeSets[setIndexSource].union(treeSets[setIndexTarget])
+                    treeSets.pop(setIndexTarget)
 
     return spanningTree, len([degree for degree in spanningTree.indegree() if degree == 1])
 
@@ -85,9 +86,9 @@ def findSetIndex(setList: set, item):
 def getExpandableNode(graph: Graph, nodesInTree: set, leaves: set):
     leafPriorityDegree = (None, 999, -1)  # (leaf vertex, priority of rule, degree of vertex)
     for leaf in leaves:
-        nonTreeNeighbors = [graph.vs[x]["name"] for x in graph.neighbors(leaf) if graph.vs[x]["name"] not in nodesInTree]
+        nonTreeNeighbors = [graph.vs[x]["name"] for x in graph.neighbors(graph.vs.find(leaf)) if graph.vs[x]["name"] not in nodesInTree]
         if len(nonTreeNeighbors) == 1:
-            nonTreeNeighborsOfNeighbor = [graph.vs[x]["name"] for x in graph.neighbors(nonTreeNeighbors[0]) if graph.vs[x]["name"] not in nodesInTree]
+            nonTreeNeighborsOfNeighbor = [graph.vs[x]["name"] for x in graph.neighbors(graph.vs.find(nonTreeNeighbors[0])) if graph.vs[x]["name"] not in nodesInTree]
             if len(nonTreeNeighborsOfNeighbor) >= 2 and (1 < leafPriorityDegree[1] or len(nonTreeNeighborsOfNeighbor) > leafPriorityDegree[2]):
                 leafPriorityDegree = (leaf, 1, len(nonTreeNeighborsOfNeighbor))
         elif len(nonTreeNeighbors) >= 2:

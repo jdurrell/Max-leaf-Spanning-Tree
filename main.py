@@ -6,7 +6,7 @@ from SolutionAlgorithms import ForestWithExpansionRules
 
 def main():
     inputFilename = 'hard.in'
-    outputFilename = 'hardtest.out'
+    outputFilename = 'hard.out'
 
     # generate new output filename if it already exists
     if os.path.isfile(outputFilename):

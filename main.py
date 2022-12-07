@@ -7,6 +7,7 @@ from SolutionAlgorithms import ForestWithExpansionRules
 def main():
     inputFilename = 'all-hard.in'
     outputFilename = 'all-hard.out'
+    numAttempts = 100
 
     # generate new output filename if it already exists
     if os.path.isfile(outputFilename):
@@ -24,9 +25,10 @@ def main():
         except Exception as e:
             print(f'Error with instance {i}: {str(e)}')
         
-        # run algorithm 20 times on each graph and take the best solution found
+        # run algorithm multiple times on each graph and take the best solution found
+        # this makes use of some randomness due to set hashing (although diminishing returns are likely heavy)
         solutions = []
-        for i in range(20):
+        for i in range(numAttempts):
             solutionTree, numLeaves = ForestWithExpansionRules.solve(graph)
             assertValidSolution(graph, solutionTree, numLeaves)
             solutions.append((solutionTree, numLeaves))
@@ -37,7 +39,7 @@ def main():
         assert maxSolution is not None
 
         # write graph out to file and print to console for progress tracking
-        print(f'Graph {i}: |V|={graph.vcount()}, |E|={graph.ecount()}, leaves = {numLeaves}')
+        print(f'Graph {graphNum}: |V|={graph.vcount()}, |E|={graph.ecount()}, leaves = {numLeaves}')
         writeGraphToFile(maxSolution[0], maxSolution[1], outputFilename)
         graphNum += 1
     parser.close()

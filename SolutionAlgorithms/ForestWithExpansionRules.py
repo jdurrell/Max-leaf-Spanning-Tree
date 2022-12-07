@@ -1,4 +1,5 @@
 from igraph import Graph
+import random
 
 '''
 This algorithm attempts to solve the maximum leaf spanning tree problem by building a forest of trees that have as many
@@ -27,14 +28,18 @@ def solve(graph: Graph):
     # build a new tree in the forest while the graph has a node that is reasonable to expand
     # nodes of degree <= 2 are less useful for expansion roots because they often end up as leaves when upon connecting components
     while graphInProcess.maxdegree() >= 3:
-        # find the node with the maximum degree (likely the best one to use as the root for this tree)
+        # find a random node with the maximum degree (likely a best one to use as the root for this tree)
+        # randomness is used because this algorithm is repeated multiple times to find a potentially better solution
         maxDegree = -1
-        maxDegreeNode = -1
+        maxDegreeNodes = []
         for node in graphInProcess.vs:
             degree = graphInProcess.degree(node)
-            if degree > maxDegree:
+            if degree == maxDegree:
+                maxDegreeNodes.append(node)
+            elif degree > maxDegree:
                 maxDegree = degree
-                maxDegreeNode = node
+                maxDegreeNodes = [node]
+        maxDegreeNode = random.choice(maxDegreeNodes)
 
         # build a new tree in the forest
         nodeNames = [graphInProcess.vs[node]["name"] for node in graphInProcess.neighbors(maxDegreeNode)]

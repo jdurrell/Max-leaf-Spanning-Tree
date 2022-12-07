@@ -16,7 +16,7 @@ def main():
         outputFilename = f'{outputFilename} ({i})'
 
     parser = GraphParser(inputFilename)
-    i = 0
+    graphNum = 0
     while parser.hasNext():
         graph = parser.readNextGraph()
         try:
@@ -38,8 +38,8 @@ def main():
 
         # write graph out to file and print to console for progress tracking
         print(f'Graph {i}: |V|={graph.vcount()}, |E|={graph.ecount()}, leaves = {numLeaves}')
-        writeGraphToFile(solutionTree, numLeaves, outputFilename)
-        i = i + 1
+        writeGraphToFile(maxSolution[0], maxSolution[1], outputFilename)
+        graphNum += 1
     parser.close()
 
 

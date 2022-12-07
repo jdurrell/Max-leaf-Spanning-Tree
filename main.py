@@ -5,8 +5,8 @@ from graphParser import GraphParser
 from SolutionAlgorithms import ForestWithExpansionRules
 
 def main():
-    inputFilename = 'hard.in'
-    outputFilename = 'hard.out'
+    inputFilename = 'all-hard.in'
+    outputFilename = 'all-hard.out'
 
     # generate new output filename if it already exists
     if os.path.isfile(outputFilename):
@@ -16,13 +16,40 @@ def main():
         outputFilename = f'{outputFilename} ({i})'
 
     parser = GraphParser(inputFilename)
+    i = 0
     while parser.hasNext():
         graph = parser.readNextGraph()
-        assert graph.is_connected()  # ensure that the graph has a valid spanning tree
+        try:
+            assertValidInputGraph(graph)
+        except Exception as e:
+            print(f'Error with instance {i}: {str(e)}')
         solutionTree, numLeaves = ForestWithExpansionRules.solve(graph)
+        print(f'Graph {i}: |V|={graph.vcount()}, |E|={graph.ecount()}, leaves = {numLeaves}')
         assertValidSolution(graph, solutionTree, numLeaves)
         writeGraphToFile(solutionTree, numLeaves, outputFilename)
+        i = i + 1
     parser.close()
+
+
+def assertValidInputGraph(graph: igraph.Graph):
+    assert graph.is_connected()
+    assert graph.vcount() <= 100
+    assert graph.ecount() <= 2000
+    
+    # check that the graph doesn't contain duplicate or self edges
+    adjacencyList = {}
+    for edge in graph.es:
+        assert edge.source != edge.target
+        if edge.source < edge.target:
+            if edge.source not in adjacencyList.keys():
+                adjacencyList[edge.source] = set()
+            assert edge.target not in adjacencyList[edge.source]
+            adjacencyList[edge.source].add(edge.target)
+        else:
+            if edge.target not in adjacencyList.keys():
+                adjacencyList[edge.target] = set()
+            assert edge.source not in adjacencyList[edge.target]
+            adjacencyList[edge.target].add(edge.source)
 
 
 def assertValidSolution(originalGraph: igraph.Graph, solutionTree: igraph.Graph, numLeaves):
@@ -54,12 +81,12 @@ def writeGraphToFile(graph: igraph.Graph, numLeaves, filename: str):
     edgeList = lexigraphicalEdgeOrder(graph)
     for edge in edgeList:
         file.write(f'{edge[0]} {edge[1]}\n')
-    # adjacency_list = graph.to_list_dict()
-    # for key in sorted(adjacency_list.keys()):
-    #     for neighbor in sorted(adjacency_list[key]):
-    #         file.write(f'{key} {neighbor}\n')
 
     file.close()
+
+    file2 = open(filename + '_summary.txt', 'a')
+    file2.write(f'leaves: {numLeaves}\n')
+    file2.close()
 
 
 def lexigraphicalEdgeOrder(graph: igraph.Graph):

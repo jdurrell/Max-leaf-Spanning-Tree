@@ -23,9 +23,21 @@ def main():
             assertValidInputGraph(graph)
         except Exception as e:
             print(f'Error with instance {i}: {str(e)}')
-        solutionTree, numLeaves = ForestWithExpansionRules.solve(graph)
+        
+        # run algorithm 20 times on each graph and take the best solution found
+        solutions = []
+        for i in range(20):
+            solutionTree, numLeaves = ForestWithExpansionRules.solve(graph)
+            assertValidSolution(graph, solutionTree, numLeaves)
+            solutions.add((solutionTree, numLeaves))
+        maxSolution = (None, -1)
+        for solution in solutions:
+            if solution[1] > maxSolution[1]:
+                maxSolution = solution
+        assert maxSolution is not None
+
+        # write graph out to file and print to console for progress tracking
         print(f'Graph {i}: |V|={graph.vcount()}, |E|={graph.ecount()}, leaves = {numLeaves}')
-        assertValidSolution(graph, solutionTree, numLeaves)
         writeGraphToFile(solutionTree, numLeaves, outputFilename)
         i = i + 1
     parser.close()

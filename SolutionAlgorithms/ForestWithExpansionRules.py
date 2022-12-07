@@ -1,26 +1,33 @@
 from igraph import Graph
 
+'''
+This algorithm attempts to solve the maximum leaf spanning tree problem by building a forest of trees that have as many
+leaves as possible, then connecting those trees together to form the full spanning tree.
+
+When connecting these components, the algorithm can prefer to pick edges between known *branches* to maintain as many
+leaves as possible on the trees being connected. 
+
+Note: from the igraph library, we use graph.vs.[node_index]["name"] to get the "name" of the vertex instead of using its index
+        in the graph. This is because we end up deleting vertices from the working copy of the graph in order to make the 
+        computation easier, but this changes the indices of those vertices, so working with names is more consistent.
+
+        We then get the vertex index from the name using graph.vs.find(name). Although it's supposed to be able to use the 
+        name property as an index, the names are constructed in the graph parser as strings from the original numbering of
+        the vertices, and I don't trust Python developers or Python's typing system to not pull a Javascript on me and just 
+        treat the string version of a number as an actual integer value instead of a string.
+'''
+
 def solve(graph: Graph):
     graphInProcess: Graph = graph.copy()  # copy graph so that we can delete from it without altering the original input
     spanningTree = Graph()
     spanningTree.add_vertices([str(x) for x in range(graph.vcount())])
     treeSets = [] # list of sets representing each tree in the forest (connected components)
 
-    '''
-    Note: throughout this algorithm we use graph.vs.[node_index]["name"] to get the "name" of the vertex instead of using its index
-          in the graph. This is because we end up deleting vertices from the working copy of the graph in order to make the 
-          computation easier, but this changes the indices of those vertices.
 
-          We then get the vertex index from the name using graph.vs.find(name). Although it's supposed to be able to use the 
-          name property as an index, the names are constructed in the graph parser as strings from the original numbering of
-          the vertices, and I don't trust Python modules and Python's typing system to not pull a Javascript on me and just 
-          treat the string version of a number as an actual integer value instead of a string.
-    '''
-
-    # while graph has a node that is reasonable to expand
+    # build a new tree in the forest while the graph has a node that is reasonable to expand
     # nodes of degree <= 2 are less useful for expansion roots because they often end up as leaves when upon connecting components
     while graphInProcess.maxdegree() >= 3:
-        # iterate through each node and find the one with the maximum degree (likely the best one to expand)
+        # find the node with the maximum degree (likely the best one to use as the root for this tree)
         maxDegree = -1
         maxDegreeNode = -1
         for node in graphInProcess.vs:
@@ -43,7 +50,7 @@ def solve(graph: Graph):
             leaves.remove(leafNodeName)
             nonTreeNeighbors: list[str] = [graphInProcess.vs[x]["name"] for x in graphInProcess.neighbors(graphInProcess.vs.find(leafNodeName)) if graphInProcess.vs[x]["name"] not in nodesInTree]
             
-            # if the expansion node has just one new neighbor, then it's the higher-priority expansion rule
+            # if the expansion node has just one new neighbor, then it's the higher-priority expansion type
             # expand the tree to this node, then expand it to all of that neighbor's neighbors (with the neighbor as the parent)
             if len(nonTreeNeighbors) == 1:
                 neighborName: str = nonTreeNeighbors[0]

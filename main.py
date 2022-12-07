@@ -7,7 +7,7 @@ from SolutionAlgorithms import ForestWithExpansionRules
 def main():
     inputFilename = 'all-hard.in'
     outputFilename = 'all-hard.out'
-    numAttempts = 150
+    numAttempts = 500
 
     # generate new output filename if it already exists
     if os.path.isfile(outputFilename):
@@ -23,7 +23,7 @@ def main():
         try:
             assertValidInputGraph(graph)
         except Exception as e:
-            print(f'Error with instance {i}: {str(e)}')
+            print(f'Error with instance {graphNum}: {str(e)}')
         
         # run algorithm multiple times on each graph and take the best solution found
         # this makes use of some randomness due to set hashing (although diminishing returns are likely heavy)

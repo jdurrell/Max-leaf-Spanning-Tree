@@ -29,7 +29,7 @@ def main():
         for i in range(20):
             solutionTree, numLeaves = ForestWithExpansionRules.solve(graph)
             assertValidSolution(graph, solutionTree, numLeaves)
-            solutions.add((solutionTree, numLeaves))
+            solutions.append((solutionTree, numLeaves))
         maxSolution = (None, -1)
         for solution in solutions:
             if solution[1] > maxSolution[1]:

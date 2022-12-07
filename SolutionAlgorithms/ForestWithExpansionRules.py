@@ -8,6 +8,8 @@ leaves as possible, then connecting those trees together to form the full spanni
 When connecting these components, the algorithm can prefer to pick edges between known *branches* to maintain as many
 leaves as possible on the trees being connected. 
 
+Full code is available at https://github.com/jdurrell/Max-leaf-Spanning-Tree
+
 Note: from the igraph library, we use graph.vs.[node_index]["name"] to get the "name" of the vertex instead of using its index
         in the graph. This is because we end up deleting vertices from the working copy of the graph in order to make the 
         computation easier, but this changes the indices of those vertices, so working with names is more consistent.

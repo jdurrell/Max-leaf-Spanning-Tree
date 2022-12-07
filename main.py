@@ -7,7 +7,7 @@ from SolutionAlgorithms import ForestWithExpansionRules
 def main():
     inputFilename = 'all-hard.in'
     outputFilename = 'all-hard.out'
-    numAttempts = 100
+    numAttempts = 150
 
     # generate new output filename if it already exists
     if os.path.isfile(outputFilename):
@@ -99,7 +99,7 @@ def writeGraphToFile(graph: igraph.Graph, numLeaves, filename: str):
     file.close()
 
     file2 = open(filename + '_summary.txt', 'a')
-    file2.write(f'leaves: {numLeaves}\n')
+    file2.write(f'{numLeaves}\n')
     file2.close()
 
 
